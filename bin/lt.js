@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 
 const openurl = require('openurl');
+const { exit } = require('yargs');
 const yargs = require('yargs');
 
 const localtunnel = require('../localtunnel');
@@ -42,6 +43,9 @@ const { argv } = yargs
   .option('allow-invalid-cert', {
     describe: 'Disable certificate checks for your local HTTPS server (ignore cert/key/ca options)',
   })
+  .option('allow-insecure-ssl-requests', {
+    describe: 'Disable certificate checks for your local HTTPS requests',
+  })
   .options('o', {
     alias: 'open',
     describe: 'Opens the tunnel URL in your browser',
@@ -52,6 +56,7 @@ const { argv } = yargs
   .require('port')
   .boolean('local-https')
   .boolean('allow-invalid-cert')
+  .boolean('allow-insecure-ssl-requests')
   .boolean('print-requests')
   .help('help', 'Show this help and exit')
   .version(version);
@@ -61,7 +66,7 @@ if (typeof argv.port !== 'number') {
   console.error('\nInvalid argument: `port` must be a number');
   process.exit(1);
 }
-
+console.log(argv);
 (async () => {
   const tunnel = await localtunnel({
     port: argv.port,
@@ -73,6 +78,7 @@ if (typeof argv.port !== 'number') {
     local_key: argv.localKey,
     local_ca: argv.localCa,
     allow_invalid_cert: argv.allowInvalidCert,
+    allow_insecure_ssl_requests: argv['allow_insecure_ssl_requests'],
   }).catch(err => {
     throw err;
   });
